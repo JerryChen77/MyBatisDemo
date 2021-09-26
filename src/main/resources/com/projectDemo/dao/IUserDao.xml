@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.projectDemo.dao.IUserDao">
+    <cache />
+
+<!--    int insert(User user);-->
+    <insert id="insert"  parameterType="com.projectDemo.pojo.User">
+
+    <selectKey order="BEFORE" keyProperty="uid" resultType="java.lang.String">
+        select replace(UUID(),"-","")
+    </selectKey>
+
+    insert into tb_user(uid,username,password,age,gender) values (#{uid},#{username},#{password},#{age},#{gender})
+  </insert>
+
+<!--    int deleteByUsername(String username);-->
+    <delete id="deleteByUsername" parameterType="java.lang.String" >
+        delete FROM tb_user where username = #{username}
+    </delete>
+
+<!--    int deleteByUid(String uid);-->
+    <delete id="deleteByUid" parameterType="java.lang.String">
+        delete * FROM tb_user where uid=#{uid}
+    </delete>
+
+<!--    int update(User user);-->
+    <update id="update" parameterType="com.projectDemo.pojo.User" >
+        update tb_user
+        <trim prefix="set" suffixOverrides=",">
+            <if test="username !=null">username=#{username},</if>
+            <if test="password !=null">password=#{password},</if>
+            <if test="age !=null">age=#{age},</if>
+            <if test="gender !=null">gender=#{gender}</if>
+        </trim>
+        where uid=#{uid}
+    </update>
+
+<!--    User findByUsername(String name);-->
+    <select id="findByUsername" parameterType="java.lang.String" resultType="com.projectDemo.pojo.User">
+             select * from tb_user where username=#{username}
+    </select>
+<!--    User findByUid(String uid);-->
+    <select id="findByUid" parameterType="java.lang.String">
+        select * from tb_user where uid=#{uid}
+    </select>
+
+<!--    List findAll();-->
+    <select id="findAll" resultType="com.projectDemo.pojo.User">
+
+    SELECT * FROM  tb_user
+
+</select>
+
+
+<!--    List<User> findByOrder(User user);-->
+    <select id="findByOrder" parameterType="com.projectDemo.dao.IUserDao" resultType="com.projectDemo.pojo.User">
+        SELECT * FROM  tb_user
+        <where>
+            <if test="uid!=null">uid=#{uid}</if>
+            <if test="username!=null">and username=#{username}</if>
+            <if test="age!=null">and age=#{age}</if>
+            <if test="gender!=null">and gender=#{gender}</if>
+            <if test="createTime!=null">and createTime=#{createTime}</if>
+            <if test="updateTime!=null">and updateTime=#{updateTime}</if>
+        </where>
+    </select>
+
+<!--    List<User> findByList(List list);-->
+    <select id="findByList" resultType="com.projectDemo.pojo.User" parameterType="java.lang.Integer">
+        select * from tb_user
+        <where>
+            <if test="list!=null">
+                uid in
+                <foreach collection="list" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+
+
+    </select>
+
+    <resultMap id="retMap" type="com.projectDemo.pojo.User">
+        <id column="uid" property="uid"></id>
+        <result column="username" property="username"></result>
+        <result column="password" property="password"></result>
+        <result column="age" property="age"></result>
+        <result column="gender" property="gender"></result>
+        <result column="create_time" property="createTime"></result>
+        <result column="update_time" property="updateTime"></result>
+    </resultMap>
+<!--    List<User> findByOrder2(User user);-->
+    <select id="findByOrder2" parameterType="com.projectDemo.pojo.User" resultMap="retMap" >
+        select * from tb_user
+        <where>
+            <choose>
+                <when test="uid != null">uid=#{uid}</when>
+                <when test="username != null">username=#{username}</when>
+                <when test="age != null">age=#{age}</when>
+                <when test="gender != null">gender=#{gender}</when>
+                <otherwise>uid=1</otherwise>
+            </choose>
+        </where>
+    </select>
+
+
+</mapper>
+
+

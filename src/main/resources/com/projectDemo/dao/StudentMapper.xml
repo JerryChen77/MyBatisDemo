@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.projectDemo.dao.StudentMapper">
+
+    <resultMap id="retMap" type="com.projectDemo.pojo.Student" >
+        <id column="stuId" property="id"></id>
+        <result column="stuName" property="stuName"></result>
+        <result column="stuSex" property="sex"></result>
+        <collection property="subjects" ofType="com.projectDemo.pojo.Subject">
+            <id column="subId" property="id"></id>
+            <result column="subName" property="subName"></result>
+            <result column="subGrade" property="grade"></result>
+        </collection>
+    </resultMap>
+<!--    Student findStuWithSubById(int id);-->
+    <select id="findStuWithSubById" resultMap="retMap" >
+        SELECT
+            st.id       stuId,
+            st.name     stuName,
+            st.sex      stuSex,
+            sb.id       subId,
+            sb.name     subName,
+            sb.grade    subGrade
+        FROM student st
+          LEFT JOIN subject_student ss
+            ON st.id = ss.student_id
+          LEFT JOIN SUBJECT sb
+            ON ss.subject_id = sb.id
+        WHERE st.id=#{id}
+    </select>
+
+
+
+</mapper>
